@@ -14,7 +14,7 @@ def should_run(**context):
 
     last_processed_str = Variable.get(
         "usgs_last_processed",
-        default_var="2026-01-01T00:00:00+00:00",
+        default_var="1970-01-01T00:00:00+00:00",
     )
     last_processed = datetime.fromisoformat(last_processed_str)
 
