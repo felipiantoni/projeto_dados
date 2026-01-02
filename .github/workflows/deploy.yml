@@ -8,11 +8,11 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
-      - name: Update repo on VM
+      - name: Update repo in prod folder
         shell: bash
         run: |
           set -euo pipefail
-          cd /home/felipi/Desktop/prod/projeto_pipeline
+          cd /home/felipi/Desktop/prod/projeto_dados
           git fetch origin
           git reset --hard origin/main
           echo "Deployed: $(git rev-parse --short HEAD)"
