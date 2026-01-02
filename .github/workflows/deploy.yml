@@ -1,43 +1,18 @@
-name: Deploy to VM
+name: Deploy on VM
 
 on:
   push:
     branches: ["main"]
 
-concurrency:
-  group: deploy-main
-  cancel-in-progress: true
-
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
+    runs-on: self-hosted
     steps:
-      - name: Setup SSH
+      - name: Update repo on VM
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-
-          # Private key for SSH into the VM
-          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          # Known hosts (recommended)
-          echo "${{ secrets.VM_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-
-      - name: Deploy (git fetch + hard reset)
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -p ${{ secrets.VM_PORT }} ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            set -euo pipefail
-
-            PROJECT_DIR="/home/felipi/Desktop/prod/projeto_pipeline"
-
-            cd "$PROJECT_DIR"
-
-            echo "==> Before:"
-            gi
+          cd /home/felipi/Desktop/prod/projeto_pipeline
+          git fetch origin
+          git reset --hard origin/main
+          echo "Deployed: $(git rev-parse --short HEAD)"
