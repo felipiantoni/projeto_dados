@@ -43,6 +43,13 @@ def fetch_usgs(**context):
     ti = context["ti"]
     starttime = ti.xcom_pull(task_ids="check_window", key="starttime")
     endtime = ti.xcom_pull(task_ids="check_window", key="endtime")
+    if not starttime or not endtime:
+        raise ValueError("starttime/endtime ausentes no XCom da task check_window")
+
+    start_dt = datetime.fromisoformat(starttime).astimezone(timezone.utc)
+    end_dt = datetime.fromisoformat(endtime).astimezone(timezone.utc)
+    start_param = start_dt.strftime("%Y-%m-%dT%H:%M:%S")
+    end_param = end_dt.strftime("%Y-%m-%dT%H:%M:%S")
 
     base_url = "https://earthquake.usgs.gov/fdsnws/event/1/query"
     limit = 1000
@@ -52,8 +59,8 @@ def fetch_usgs(**context):
     while True:
         params = {
             "format": "geojson",
-            "starttime": starttime,
-            "endtime": endtime,
+            "starttime": start_param,
+            "endtime": end_param,
             "orderby": "time",
             "limit": limit,
             "offset": offset,
@@ -73,7 +80,7 @@ def fetch_usgs(**context):
     df = pd.json_normalize(all_features)
     print(df.head())
     print(f"Total eventos: {len(df)}")
-    Variable.set("usgs_last_processed", endtime)
+    Variable.set("usgs_last_processed", end_dt.isoformat())
 
 
 
