@@ -2,6 +2,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator, ShortCircuitOperator
 from airflow.models import Variable
 from datetime import datetime, timedelta, timezone
+import logging
 import requests
 import pandas as pd
 
@@ -23,6 +24,15 @@ def should_run(**context):
 
     # limita no maximo 1 dia por execucao
     endtime = min(endtime, starttime + timedelta(days=1))
+
+    logging.info(
+        "check_window data_interval_start=%s data_interval_end=%s last_processed=%s starttime=%s endtime=%s",
+        data_interval_start,
+        data_interval_end,
+        last_processed,
+        starttime,
+        endtime,
+    )
 
     # da skip na dag se o intervalo de execução for menor do que 5 minutos
     if endtime <= starttime or (endtime - starttime) < timedelta(minutes=5):
