@@ -10,25 +10,21 @@ import pandas as pd
 
 
 def should_run(**context):
-    data_interval_start = context["data_interval_start"]
-    data_interval_end = context["data_interval_end"]
-
     last_processed_str = Variable.get(
         "usgs_last_processed",
         default_var="1970-01-01T00:00:00+00:00",
     )
     last_processed = datetime.fromisoformat(last_processed_str)
 
-    starttime = max(data_interval_start, last_processed)
-    endtime = min(data_interval_end, datetime.now(timezone.utc))
+    # janela baseada apenas no ultimo processamento
+    starttime = last_processed
+    endtime = min(starttime + timedelta(days=1), datetime.now(timezone.utc))
 
     # limita no maximo 1 dia por execucao
     endtime = min(endtime, starttime + timedelta(days=1))
 
     logging.info(
-        "check_window data_interval_start=%s data_interval_end=%s last_processed=%s starttime=%s endtime=%s",
-        data_interval_start,
-        data_interval_end,
+        "check_window last_processed=%s starttime=%s endtime=%s",
         last_processed,
         starttime,
         endtime,
@@ -77,6 +73,7 @@ def fetch_usgs(**context):
     df = pd.json_normalize(all_features)
     print(df.head())
     print(f"Total eventos: {len(df)}")
+    Variable.set("usgs_last_processed", endtime)
 
 
 
