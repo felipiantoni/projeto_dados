@@ -41,8 +41,8 @@ def should_run(**context):
 
 def fetch_usgs(**context):
     ti = context["ti"]
-    starttime = ti.xcom_pull(key="starttime")
-    endtime = ti.xcom_pull(key="endtime")
+    starttime = ti.xcom_pull(task_ids="check_window", key="starttime")
+    endtime = ti.xcom_pull(task_ids="check_window", key="endtime")
 
     base_url = "https://earthquake.usgs.gov/fdsnws/event/1/query"
     limit = 1000
