@@ -14,7 +14,7 @@ def should_run(**context):
 
     last_processed_str = Variable.get(
         "usgs_last_processed",
-        default_var="2024-01-01T00:00:00+00:00",
+        default_var="1970-01-01T00:00:00+00:00",
     )
     last_processed = datetime.fromisoformat(last_processed_str)
 
@@ -73,7 +73,7 @@ def fetch_usgs(**context):
 
 with DAG(
     dag_id="usgs_earthquake_ingestion",
-    start_date=datetime(2024, 1, 1, tzinfo=timezone.utc),
+    start_date=datetime(2025, 12, 1, tzinfo=timezone.utc),
     schedule="*/5 * * * *",
     catchup=True,
     default_args={"owner": "airflow"},
